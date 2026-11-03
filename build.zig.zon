@@ -1,0 +1,17 @@
+.{
+    .name = .pk_qr,
+    .version = "0.1.0",
+    .fingerprint = 0x3c1856faa0d38aa7,
+    .minimum_zig_version = "0.17.0",
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "docs/protocol.md",
+        "docs/design.md",
+        "docs/roadmap.md",
+        "README.md",
+        "LICENSE",
+    },
+}

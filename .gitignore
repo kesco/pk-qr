@@ -1,0 +1,12 @@
+# 参考项目源码：仅本地对照阅读，不提交、不随发行物分发
+docs/k1ii-qr/
+
+# Zig 构建产物与本地缓存
+.zig-cache/
+zig-out/
+
+# 本地生成的二维码输出
+out/
+
+# macOS / 编辑器
+.DS_Store
