@@ -1,0 +1,80 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.17.0
+      - run: zig build test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-linux-musl
+            asset: pk-qr-linux-x86_64
+          - target: aarch64-linux-musl
+            asset: pk-qr-linux-aarch64
+          - target: aarch64-macos
+            asset: pk-qr-macos-arm64
+          - target: x86_64-macos
+            asset: pk-qr-macos-x86_64
+          - target: x86_64-windows
+            asset: pk-qr-windows-x86_64.exe
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mlugg/setup-zig@v2
+        with:
+          version: 0.17.0
+
+      - name: Build
+        run: zig build -Dtarget=${{ matrix.target }} -Doptimize=ReleaseSafe
+
+      - name: Stage asset
+        run: |
+          mkdir -p dist
+          if [ -f zig-out/bin/pk-qr.exe ]; then
+            cp zig-out/bin/pk-qr.exe "dist/${{ matrix.asset }}"
+          else
+            cp zig-out/bin/pk-qr "dist/${{ matrix.asset }}"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: dist/${{ matrix.asset }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        run: cd dist && sha256sum * > SHA256SUMS
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --generate-notes --title "$GITHUB_REF_NAME" dist/*

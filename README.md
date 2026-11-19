@@ -34,6 +34,15 @@ zig build -Dtarget=x86_64-linux-musl -Doptimize=ReleaseSafe
 zig build -Dtarget=x86_64-windows -Doptimize=ReleaseSafe
 ```
 
+## 发布
+
+推送 `v*` 标签触发 GitHub Release：CI 先跑测试，再交叉编译 Linux（x86_64/aarch64 musl）、macOS（arm64/x86_64）与 Windows（x86_64）二进制，附 `SHA256SUMS` 发布。
+
+```sh
+git tag v0.1.0
+git push origin v0.1.0
+```
+
 ## 用法
 
 ```sh
