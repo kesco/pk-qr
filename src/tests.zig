@@ -14,13 +14,14 @@ test {
     _ = @import("cli.zig");
 }
 
-test "48 条参考向量逐条复算" {
-    // 12 组（机型, 序列号）× 4 项功能 = 48 条 payload。
-    try std.testing.expectEqual(@as(usize, 12), vectors.all.len);
+test "60 条参考向量逐条复算" {
+    // 15 组（机型, 序列号）× 4 项功能 = 60 条 payload。
+    try std.testing.expectEqual(@as(usize, 15), vectors.all.len);
 
     var checked: usize = 0;
     var seen_k1 = false;
     var seen_k3 = false;
+    var seen_k3iiim = false;
     for (vectors.all) |vector| {
         const model = std.meta.stringToEnum(pentax.Model, vector.model) orelse
             return error.UnknownModelInVectors;
@@ -35,9 +36,10 @@ test "48 条参考向量逐条复算" {
         }
         if (model == .k1) seen_k1 = true;
         if (model == .k3iii) seen_k3 = true;
+        if (model == .k3iiim) seen_k3iiim = true;
     }
-    try std.testing.expectEqual(@as(usize, 48), checked);
-    try std.testing.expect(seen_k1 and seen_k3);
+    try std.testing.expectEqual(@as(usize, 60), checked);
+    try std.testing.expect(seen_k1 and seen_k3 and seen_k3iiim);
 }
 
 test "同序列号的 K-1 与 K-1 II 结果不同" {
@@ -49,5 +51,17 @@ test "同序列号的 K-1 与 K-1 II 结果不同" {
         const b = pentax.payload(k1ii, k1ii.features[index], serial);
         try std.testing.expect(!std.mem.eql(u8, &a, &b));
         try std.testing.expectEqual(feature.id, k1ii.features[index].id);
+    }
+}
+
+test "K-3 III Monochrome 与彩色版共用功能 ID 但 payload 不同" {
+    const serial = "1234567";
+    const color = pentax.modelInfo(.k3iii);
+    const mono = pentax.modelInfo(.k3iiim);
+    for (color.features, 0..) |feature, index| {
+        const a = pentax.payload(color, feature, serial);
+        const b = pentax.payload(mono, mono.features[index], serial);
+        try std.testing.expect(!std.mem.eql(u8, &a, &b));
+        try std.testing.expectEqual(feature.id, mono.features[index].id);
     }
 }

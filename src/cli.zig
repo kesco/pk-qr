@@ -74,6 +74,7 @@ fn parseModel(value: []const u8) ParseError!pentax.Model {
     if (std.mem.eql(u8, value, "k1")) return .k1;
     if (std.mem.eql(u8, value, "k1ii")) return .k1ii;
     if (std.mem.eql(u8, value, "k3iii")) return .k3iii;
+    if (std.mem.eql(u8, value, "k3iiim")) return .k3iiim;
     return error.UnknownModel;
 }
 
@@ -214,6 +215,13 @@ test "内联值与模型、格式、功能选择" {
     try std.testing.expect(parsed.config.force);
     try std.testing.expect(parsed.config.dry_run);
     try std.testing.expectEqualSlices(bool, &.{ true, false, false, true }, &parsed.config.features);
+}
+
+test "Monochrome 解析与 K-3 III 功能 ID" {
+    const args = [_][:0]const u8{ "pk-qr", "-s", "1234567", "-m", "k3iiim", "--feature", "28" };
+    const parsed = try runParse(&args);
+    try std.testing.expectEqual(pentax.Model.k3iiim, parsed.config.model);
+    try std.testing.expectEqualSlices(bool, &.{ true, false, false, false }, &parsed.config.features);
 }
 
 test "帮助与版本立即返回" {

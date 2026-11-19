@@ -30,7 +30,7 @@ const help_text =
     \\  -s, --serial <str>      1-20 位 ASCII 数字，首尾空白会被去掉，前导零保留
     \\
     \\选项：
-    \\  -m, --model <name>      k1 | k1ii | k3iii（默认 k1ii）
+    \\  -m, --model <name>      k1 | k1ii | k3iii | k3iiim（默认 k1ii）
     \\  -o, --out <dir>         输出目录（默认 .，不自动创建）
     \\  -f, --format <fmt>      png | svg | text（默认 png；text 直接打印，不写文件）
     \\      --scale <1-64>      每模块像素边长，png/svg 用（默认 12）
@@ -232,7 +232,7 @@ fn cliFailure(err: cli.ParseError) u8 {
         error.MissingValue => "缺少参数值",
         error.InvalidValue => "参数取值无效",
         error.MissingSerial => "缺少 --serial",
-        error.UnknownModel => "不支持的机型（k1 / k1ii / k3iii）",
+        error.UnknownModel => "不支持的机型（k1 / k1ii / k3iii / k3iiim）",
         error.UnknownFeature => "该机型没有此功能（按 ID 或 slug 指定）",
         error.ConflictingFlags => "--json 与 -f text 不能同时使用",
     };

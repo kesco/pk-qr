@@ -5,7 +5,7 @@
 const std = @import("std");
 const Sha256 = std.crypto.hash.sha2.Sha256;
 
-pub const Model = enum { k1, k1ii, k3iii };
+pub const Model = enum { k1, k1ii, k3iii, k3iiim };
 
 pub const Feature = struct {
     id: u32,
@@ -43,6 +43,7 @@ pub fn modelInfo(model: Model) ModelInfo {
         .k1ii => .{ .model = .k1ii, .name = "K-1 II", .word = 78400, .file_prefix = "K1II", .features = features },
         .k1 => .{ .model = .k1, .name = "K-1", .word = 77970, .file_prefix = "K1", .features = features },
         .k3iii => .{ .model = .k3iii, .name = "K-3 III", .word = 78420, .file_prefix = "K3III", .features = features_k3iii },
+        .k3iiim => .{ .model = .k3iiim, .name = "K-3 III Monochrome", .word = 78550, .file_prefix = "K3IIIM", .features = features_k3iii },
     };
 }
 
@@ -181,8 +182,10 @@ test "模型表与功能表" {
     try std.testing.expectEqual(@as(u32, 78400), modelInfo(.k1ii).word);
     try std.testing.expectEqual(@as(u32, 77970), modelInfo(.k1).word);
     try std.testing.expectEqual(@as(u32, 78420), modelInfo(.k3iii).word);
+    try std.testing.expectEqual(@as(u32, 78550), modelInfo(.k3iiim).word);
     try std.testing.expectEqualStrings("K1II", modelInfo(.k1ii).file_prefix);
     try std.testing.expectEqualStrings("K3III", modelInfo(.k3iii).file_prefix);
+    try std.testing.expectEqualStrings("K3IIIM", modelInfo(.k3iiim).file_prefix);
     try std.testing.expectEqualSlices(u32, &.{ 2, 11, 14, 17 }, &.{
         modelInfo(.k1).features[0].id, modelInfo(.k1).features[1].id,
         modelInfo(.k1).features[2].id, modelInfo(.k1).features[3].id,
