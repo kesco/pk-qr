@@ -16,7 +16,7 @@
 - 固件解析、相机连接、真机扫码自动化。
 - 网页/图形界面（参考项目已提供浏览器版）。
 - ZIP 打包（已定不做，理由见 roadmap 决策记录 #3；分发用 `tar` 或目录复制）。
-- K-3 III Monochrome 及其他机型（无已验证的机型值/功能 ID）。
+- K-3 II 及其他机型（无已验证的机型值/功能 ID）。
 - 批量序列号、模板定制、二维码美化（渐变、logo、圆角）。
 
 ## 2. 工具链
@@ -85,7 +85,7 @@ flowchart LR
 
 ```zig
 // pentax.zig
-pub const Model = enum { k1, k1ii, k3iii };
+pub const Model = enum { k1, k1ii, k3iii, k3iiim };
 pub const Feature = struct { id: u32, name_zh: []const u8, slug: []const u8 };
 pub const ModelInfo = struct { word: u32, prefix: []const u8, features: [4]Feature };
 pub const Payload = [64]u8; // 小写 hex，无 NUL
@@ -167,7 +167,7 @@ pk-qr --serial <digits> [--model k1ii] [--out DIR] [--format png] [--json]
 | 参数 | 取值 | 默认 | 说明 |
 | --- | --- | --- | --- |
 | `-s, --serial` | 字符串 | 必需 | 1–20 位 ASCII 数字，首尾空白被去除 |
-| `-m, --model` | `k1`/`k1ii`/`k3iii` | `k1ii` | 未知值直接报错，不回退 |
+| `-m, --model` | `k1`/`k1ii`/`k3iii`/`k3iiim` | `k1ii` | 未知值直接报错，不回退 |
 | `-o, --out` | 目录 | `.` | 不存在则报错，不自动创建 |
 | `-f, --format` | `png`/`svg`/`text` | `png` | `text` 直接打印到 stdout，不落盘（见第 7 节） |
 | `--color` | `auto`/`always`/`never` | `auto` | 仅 text；`auto` = stdout 是 TTY 且未设 `NO_COLOR` |
@@ -196,6 +196,9 @@ pk-qr --serial 1234567
 
 # K-3 III，只生成渐变 ND 与星空影像处理，指定输出目录与缩放
 pk-qr -m k3iii -s 0012345 -o out --feature gradient-nd --feature astro-processing --scale 16
+
+# K-3 III Monochrome，四项功能
+pk-qr -m k3iiim -s 0012345 -o out
 
 # 管道检查：不落盘，只打印 payload
 pk-qr -s 1234567 --dry-run --json
@@ -266,7 +269,7 @@ pk-qr -s 1234567 -f text > qr.txt
 | Zig 0.17 `std.Io` 仍在演进 | 升级成本 | 核心纯函数不接触 I/O；I/O 集中在 main/cli |
 | 掩码与参考实现不同 | 视觉差异 | 不追求逐字节相同，只保证解码内容与向量一致 |
 | 文件名中文不兼容 | Windows/脚本出错 | 文件名用 ASCII slug，中文只出现在 JSON/终端 |
-| 真机未验证 | 可能被相机拒绝 | 保持参考实现的图形参数；`--scale`/`--border` 可回调；在 roadmap 里列为待验证项 |
+| 部分机型未经真机验证 | K-1（初代）可能被相机拒绝 | K-1 II、K-3 III 彩色、K-3 III Monochrome 已确认；K-1 保持参考实现的图形参数，`--scale`/`--border` 可回调；见 roadmap 第 4 节 |
 | 用户输入路径字符 | 目录穿越 | 序列号只允许 `0-9`，文件名其余部分由代码生成 |
 
 ## 12. 构建与发布

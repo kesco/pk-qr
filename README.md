@@ -2,7 +2,7 @@
 
 宾得（PENTAX）功能二维码的 CLI 生成器。纯本地计算，不联网、不连接相机、不上传序列号。用 Zig 编写，单文件可执行程序，零第三方依赖。
 
-支持 K-1、K-1 II、K-3 III（普通彩色版），每台机身四张码：渐变 ND、星点自动对焦、遥控对焦微动、星空影像处理。
+支持 K-1、K-1 II、K-3 III 彩色版与 K-3 III Monochrome，每台机身四张码：渐变 ND、星点自动对焦、遥控对焦微动、星空影像处理。
 
 实现原理参考 [k1ii-qr](https://github.com/nahtaki/k1ii-qr)。
 
@@ -43,6 +43,9 @@ pk-qr --serial 1234567
 # 指定机型、输出目录、缩放与静区
 pk-qr -m k3iii -s 0012345 -o out --scale 16 --border 4
 
+# K-3 III Monochrome（黑白版），功能 ID 与彩色版相同
+pk-qr -m k3iiim -s 0012345 -o out
+
 # 只要渐变 ND 与星空影像处理
 pk-qr -s 0012345 --feature gradient-nd --feature 37
 
@@ -61,9 +64,10 @@ pk-qr -s 1234567 -o out --force
 ```text
 {机型前缀}_{序号2位}_{功能slug}_{序列号}.{png|svg}
 K1II_01_gradient-nd_0012345.png
+K3IIIM_01_gradient-nd_0012345.png
 ```
 
-`--feature` 接受功能 ID（如 `2`）或 slug（如 `gradient-nd`），可重复，默认全部四项。
+`--feature` 接受功能 ID（如 `2`）或 slug（如 `gradient-nd`），可重复，默认全部四项。K-3 III 与 K-3 III Monochrome 使用同一组 ID：`28`/`31`/`34`/`37`。
 
 ## 退出码
 
@@ -77,9 +81,9 @@ K1II_01_gradient-nd_0012345.png
 
 ## 已验证
 
-- 48 条内容向量（12 组「机型 + 序列号」× 4 项功能）与参考实现逐字节一致，见 [docs/protocol.md](docs/protocol.md) 第 5 节。
+- 60 条内容向量（15 组「机型 + 序列号」× 4 项功能）与参考实现逐字节一致，见 [docs/protocol.md](docs/protocol.md) 第 5 节；其中 K-3 III Monochrome 的 12 条来自参考项目固件 2.20 向量。
 - 生成的 PNG 经 zxing-cpp 解码，4/4 得到预期 payload；终端半块字符渲染与无色渲染同样可解码。
-- 尚未在真机上确认相机是否接受这些二维码，见 [docs/roadmap.md](docs/roadmap.md) 第 4 节。
+- K-3 III（彩色，`-m k3iii`）已由维护者真机确认相机可接受生成的二维码（2026-11-05）；K-1 II（`-m k1ii`）与 K-3 III Monochrome（`-m k3iiim`）同样已真机确认（2026-11-19）。仅 K-1（初代）尚未真机确认，见 [docs/roadmap.md](docs/roadmap.md) 第 4 节。
 
 ## 许可
 
@@ -97,8 +101,8 @@ K1II_01_gradient-nd_0012345.png
 | --- | --- |
 | [docs/protocol.md](docs/protocol.md) | 二维码内容算法、机型与功能表、验证向量、验收标准 |
 | [docs/design.md](docs/design.md) | 实现架构、模块划分、CLI 契约、输出格式 |
-| [docs/roadmap.md](docs/roadmap.md) | 里程碑、测试策略、真机待验证项、决策记录 |
+| [docs/roadmap.md](docs/roadmap.md) | 里程碑、测试策略、真机验证记录、决策记录 |
 
 ## 免责声明
 
-非官方工具，与理光/宾得无关联。生成的二维码未在真机上完成扫码确认前，请自行评估风险。
+非官方工具，与理光/宾得无关联。K-1 II、K-3 III（彩色）与 K-3 III Monochrome 已通过真机扫码确认；K-1（初代）尚未确认，请自行评估风险。

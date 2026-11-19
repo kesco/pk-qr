@@ -2,7 +2,7 @@
 
 本文档定义本项目必须逐字节复现的内容算法，以及二维码的输出图形参数。
 
-参考项目：`nahtaki/k1ii-qr`，本地克隆于 `docs/k1ii-qr/`（被 `.gitignore` 排除），对照提交 `5edd7221f323781a441751defaa650d1ac68bfb5`。
+参考项目：`nahtaki/k1ii-qr`，本地克隆于 `docs/k1ii-qr/`（被 `.gitignore` 排除），对照提交 `e322a60b43d02396be27ed5cdaf37186560ff410`。
 
 ## 1. 适用范围
 
@@ -11,10 +11,11 @@
 | K-1 II | 78400 | 2, 11, 14, 17 | `K1II` |
 | K-1 | 77970 | 2, 11, 14, 17 | `K1` |
 | K-3 III（彩色） | 78420 | 28, 31, 34, 37 | `K3III` |
+| K-3 III Monochrome | 78550 | 28, 31, 34, 37 | `K3IIIM` |
 
 四项功能的固定顺序与显示名：
 
-| 序号 | 功能 | K-1 / K-1 II ID | K-3 III ID | ASCII slug（文件名用） |
+| 序号 | 功能 | K-1 / K-1 II ID | K-3 III / Monochrome ID | ASCII slug（文件名用） |
 | --- | --- | --- | --- | --- |
 | 1 | 渐变 ND | 2 | 28 | `gradient-nd` |
 | 2 | 星点自动对焦 | 11 | 31 | `star-autofocus` |
@@ -23,7 +24,9 @@
 
 K-1 与 K-1 II 的功能 ID 相同，但 `modelWord` 不同，因此同样序列号生成的二维码内容不同，不可混用。
 
-不在范围内：K-3 III Monochrome、K-3 II 及其他机型。未获得其机型值或功能 ID，不得推测。
+K-3 III Monochrome 与彩色版共用功能 ID，但 `modelWord` 不同（78550 对 78420），因此同样序列号生成的 payload 不同，不可混用。
+
+不在范围内：K-3 II 及其他机型。未获得其机型值或功能 ID，不得推测。
 
 ## 2. 输入：序列号规范化
 
@@ -92,7 +95,7 @@ payload = digest 的 64 个小写十六进制字符
 
 ## 5. 验证向量
 
-以下向量已用独立实现（Python `hashlib` + 本文第 3 节公式）复算，与参考项目的 `vectors.json`、`k1-vectors.json`、`k3iii-vectors.json` 全部一致（48/48）。
+以下向量已用独立实现（Python `hashlib` + 本文第 3 节公式）复算，与参考项目的 `vectors.json`、`k1-vectors.json`、`k3iii-vectors.json`、`k3iiim-vectors.json` 全部一致（60/60）。
 
 列顺序固定为：渐变 ND / 星点自动对焦 / 遥控对焦微动 / 星空影像处理。
 
@@ -110,6 +113,9 @@ payload = digest 的 64 个小写十六进制字符
 | K-3 III | `1234567` | `43e11198220fe7dedd925ee771cbabb8664413b7e098ba248ed32921831eac2c` | `c13a576b9586918782466fb70693f1212c1a8d0da7d4467127cd8da7d4af369a` | `7cde30895632fda14f76bb7db6cdd6cd39064704d5c45f048b2a6faf5d7f977f` | `f212ad5fd23dc69deefb532017176a10df9a6d94a4ee7ece706941ec5d76aa66` |
 | K-3 III | `0012345` | `950139aefdeaceab303b3cd94efe6c525c6d868569c659eba1c7b7911fe35a6f` | `fd80ac345bddf4323bf2e43738b98ca11d7752d590371abb96090339bc576460` | `f5f69e80f85003bf1e52dce03d0597f329d5f07df439d751051f9ad9d2de9361` | `2f36d1a23b52b04fe529b93622b50d8d037efecf1a12c7cb0510b403c49b5d11` |
 | K-3 III | `12345678901234567890` | `5fed6ccd22260a43dba165111f27a7d0c6b9a81c8776a70d4b1670c8623b3a4a` | `9ca005088b5785f0c80cf41dacf2ad6dde81900ea3c35f0ef6bb06bee0a483ba` | `ecb2457b2e8b9ea155b845996515039d8748e3eeb77e3233010190d2fccffa4b` | `9b7feabb2406fd825e6a6207e1229046438b2c93108b1501382afd6d8dc8cac4` |
+| K-3 III Monochrome | `1234567` | `f02089cea127420a2c651bac708dd8a15c5975b1278cefa6262a0f2ab3471e5a` | `d4d5eb69d9529bc6c6fe42f3607c2ed2b0fa42db60201e484d21675ad76e9ad7` | `846c3a81c1f671dcc3486e1d9598c2423304efabcdf81eaafebbabda69e156ab` | `68b8680d22a23c8aad042b988dcc14297c33b1e22b233e8f56d3fa9f7d514d1e` |
+| K-3 III Monochrome | `0012345` | `27b3fdc8f70f78feb8623cae0180dd4dd3e1b1f11cc595c37b6a001dfde262e6` | `61cf713deab65a1b1a518d271eadf0c3bfcda26e0e71c5893ccddd5d3ac57f65` | `400e649439fd6a25b52c7bb1965b3001eb112d45dbda012fc4903b82e31bc9de` | `d32f62620f3464b3e8006a460aaa992ee1b218409ef06710dd28eb47e791072b` |
+| K-3 III Monochrome | `12345678901234567890` | `bb0246e68de1f1cbad9ac7b3bdc8a535924a87f4cb925508212b2e877377e57d` | `eee141f1b48c2bccb3446a7e96d99ea0eb170440e37846c149932abba1892a03` | `2785b91832ea0135c72b0c26aa872ec0bf818b6f0e94756971620d419ed6776c` | `abca5f7477aa4e6a85908875dc6c503d3227e9a31bc1e939484b3eeeb207ecfe` |
 
 ## 6. 验收标准
 
@@ -120,6 +126,6 @@ payload = digest 的 64 个小写十六进制字符
 
 ## 7. 未完成验证 / 风险
 
-- 参考项目自述：K-1 与 K-3 III 已通过原始固件 ARM 指令与原生 SHA-256 的离线验证；K-1 II 的验证以样本哈希界定范围（样本容器版本字段 `0x0232`、内嵌文本写作 `Version 2.51`）。
-- 所有机型均**未在真机上确认扫码结果**。本项目生成的二维码能否被相机接受，需要实机测试；测试失败时应先怀疑图形参数（尺寸、静区、模块大小），而不是内容算法。
+- 参考项目自述：K-1 与 K-3 III 已通过原始固件 ARM 指令与原生 SHA-256 的离线验证；K-3 III Monochrome 的 12 条向量来自固件 2.20 的独立原生实现；K-1 II 的验证以样本哈希界定范围（样本容器版本字段 `0x0232`、内嵌文本写作 `Version 2.51`）。
+- K-3 III（彩色）已由维护者真机确认相机可接受生成的二维码（2026-11-05）；K-1 II 与 K-3 III Monochrome 同样已真机确认（2026-11-19）。仅 K-1（初代）尚未在真机上确认扫码结果，仍需实机测试；测试失败时应先怀疑图形参数（尺寸、静区、模块大小），而不是内容算法。
 - 本仓库不包含任何真实序列号、固件或二维码照片；向量使用合成序列号。
